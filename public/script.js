@@ -10,7 +10,15 @@ const templateChatMessage = (message, from) => `
     </div>
   </div>
   `;
-
+ 
+  const templateChatList = (list, from) => `
+  <div class="from-${from}">
+    <div class="message-inner">
+      <ul>${list}</ul>
+    </div>
+  </div>
+  `;
+ 
 // Crate a Element and append to chat
 const InsertTemplateInTheChat = (template) => {
   const div = document.createElement('div');
@@ -18,6 +26,8 @@ const InsertTemplateInTheChat = (template) => {
 
   chat.appendChild(div);
 };
+
+
 
 // Calling server and get the watson output
 const getWatsonMessageAndInsertTemplate = async (text = '') => {
@@ -33,10 +43,25 @@ const getWatsonMessageAndInsertTemplate = async (text = '') => {
   })).json();
 
   context = response.result;
-console.log(context);
-  const template = templateChatMessage(context.output.generic[0].text, 'watson');
+  console.log(context);
+ 
+  let template = templateChatMessage(context.output.generic[0].text, 'watson');
 
   InsertTemplateInTheChat(template);
+  
+  if(context.output.generic[1].options){
+    let gen  = context.output.generic[1].options;
+    console.log('opciones');
+    console.log(context.output.generic[1].options);
+    console.log(context.output.generic[1].options.length);
+    let list = ``;
+    for (let i = 0; i < context.output.generic[1].options.length; i++) {
+      list +=   `<li>${context.output.generic[1].options[i].label}</li>`;
+      
+    }
+     templateList = templateChatList(list,'watson'); 
+     InsertTemplateInTheChat(templateList);
+    } 
 };
 
 textInput.addEventListener('keydown', (event) => {
